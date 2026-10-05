@@ -14,7 +14,7 @@
 ## Checklist
 
 - [ ] `ruff check .` and `ruff format --check .` pass
-- [ ] `pytest alem/tests/` passes
+- [ ] `pytest envs/alem/tests/` passes
 - [ ] Docstrings / README updated for any public API change
 - [ ] This change does **not** alter environment dynamics, observations, or scoring
       (if it does, describe the impact below — it affects reproducibility)

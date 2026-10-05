@@ -84,11 +84,11 @@ Paper = "https://arxiv.org/abs/2606.08340"
 include-package-data = true
 
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["alem*"]
+where = ["envs", "."]
+include = ["alem*", "algorithms*", "configs*"]
 exclude = [
   "alem.tests*",
-  "baselines*",
+  "algorithms.*.test*",
   "craftax*",
   "visualise*",
   "outputs*",
@@ -97,13 +97,14 @@ exclude = [
 
 [tool.setuptools.package-data]
 "alem.alem_coop" = ["assets/*"]
+"configs" = ["rl/*.yaml", "llm/*.yaml"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
 # Research/demo code is intentionally not held to the library's lint+format bar.
 # Top-level (file-resolver) exclude so both `ruff check` and `ruff format` skip these.
-exclude = ["visualise/", "examples/", "baselines/"]
+exclude = ["visualise/", "algorithms/", "scripts/random_visual_demo.py", "scripts/random_rl_agent.py", "scripts/llm_text_smoke.py", "scripts/llm_openai_smoke.py", "scripts/play_alem.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP"]

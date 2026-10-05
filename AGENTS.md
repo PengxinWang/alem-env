@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Instructions for coding agents working in this repo. Humans: start with [`README.md`](README.md).
+Instructions for coding agents working in this repo. Humans: start with [`README.md`](docs/UPSTREAM_README.md).
 
 Alem is a JAX benchmark for **open-ended multi-agent coordination**. The common task here is:
 serve an LLM, run a 3-agent team through the text interface, and get a comparable score.
@@ -18,7 +18,7 @@ defaults; change one and you no longer have a leaderboard number, you have an ab
 | Episodes | 20 per difficulty (10 minimum if cost-bound), shared seeds (`EVAL_SEED=9999`) |
 | Native reasoning | `agent.reasoning=true`. **Not the default**, see Traps |
 
-Full protocol: [`EVALUATION.md`](EVALUATION.md). Submission rules: [`SUBMISSION.md`](SUBMISSION.md).
+Full protocol: [`EVALUATION.md`](docs/EVALUATION.md). Submission rules: [`SUBMISSION.md`](docs/SUBMISSION.md).
 
 ## Setup: two environments, not one
 
@@ -65,7 +65,7 @@ triple comes from exactly one of them; picking the wrong one silently halves eve
 ## Traps that have cost real time
 
 - **Native reasoning is off unless you ask for it.** `agent.reasoning` defaults to null, which
-  resolves to `False` (`baselines/llm/eval_utils/agents/__init__.py:113`). Every leaderboard
+  resolves to `False` (`algorithms/llm/eval_utils/agents/__init__.py:113`). Every leaderboard
   entry was run with `agent.reasoning=true`. On vLLM it also needs a matching
   `--reasoning-parser` on the server, or the reasoning arrives inline and the action parser
   trips over it.
@@ -86,3 +86,13 @@ triple comes from exactly one of them; picking the wrong one silently halves eve
 - Package manager is `uv`. Python 3.12.
 - Lint/format with `ruff` (config in `pyproject.toml`); tests with `pytest`.
 - Don't commit anything under `outputs/`.
+
+## Personal fork layout
+
+- Environment: `envs/alem/`, still imported as `alem`; install with `uv pip install -e .`.
+- Algorithms: `algorithms/random/`, `algorithms/rl/`, `algorithms/llm/`.
+- Hydra configs: `configs/rl/`, `configs/llm/`; dependency lists: `configs/dependencies/`.
+- Runnable demos and orchestration: `scripts/`; docs and LLM GIFs: `docs/`.
+- Keep `origin` as the personal fork and `upstream` as the official repository.
+- Random demo: `.venv/bin/python scripts/random_visual_demo.py --steps 100`.
+- Core check: `JAX_PLATFORMS=cpu .venv/bin/python -m unittest alem.tests.test_env_factory -v`.

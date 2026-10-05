@@ -30,7 +30,7 @@ jobs:
 
       - name: Run full test suite with coverage
         run: |
-          python -m pytest alem/tests/ \
+          python -m pytest envs/alem/tests/ \
             --cov=alem \
             --cov-report=term-missing \
             --cov-report=xml:coverage.xml \

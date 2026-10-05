@@ -106,7 +106,7 @@ if [[ "${SMOKE}" == "1" ]]; then
 fi
 
 if [[ "${DIFFICULTY}" == *","* ]]; then
-  exec uv run --extra baselines-llm --python 3.12 python baselines/llm/eval_alem.py -m "${EXTRA[@]}"
+  exec uv run --extra baselines-llm --python 3.12 python algorithms/llm/eval_alem.py -m "${EXTRA[@]}"
 else
-  exec uv run --extra baselines-llm --python 3.12 python baselines/llm/eval_alem.py "${EXTRA[@]}"
+  exec uv run --extra baselines-llm --python 3.12 python algorithms/llm/eval_alem.py "${EXTRA[@]}"
 fi

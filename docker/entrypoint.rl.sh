@@ -19,7 +19,7 @@ if [[ -z "$SCRIPT" || "$SCRIPT" == "--help" || "$SCRIPT" == "-h" ]]; then
     echo "Usage: docker run --gpus all alem-rl <script> [hydra_overrides...]"
     echo ""
     echo "Available training scripts:"
-    for f in /app/baselines/*.py; do
+    for f in /app/algorithms/rl/*.py; do
         name="$(basename "$f" .py)"
         [[ "$name" == test* || "$name" == speed* || "$name" == utils ]] && continue
         echo "  $name"
@@ -36,11 +36,11 @@ fi
 [[ "${1:-}" == "$SCRIPT" ]] && shift || true
 
 echo "============================================"
-echo " Script: baselines/${SCRIPT}.py"
+echo " Script: algorithms/rl/${SCRIPT}.py"
 echo " Args:   $*"
 echo "============================================"
 
 # Trainers find their Hydra config next to the script; run from /app so Hydra's
 # outputs/ tree lands where Dockerfile.rl mounts it (-v ...:/app/outputs).
 cd /app
-exec python "baselines/${SCRIPT}.py" "$@"
+exec python "algorithms/rl/${SCRIPT}.py" "$@"

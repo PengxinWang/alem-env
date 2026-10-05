@@ -112,7 +112,7 @@ echo "Running LLM evaluation..."
 echo "============================================"
 cd /app
 # shellcheck disable=SC2086  # EVAL_EXTRA_ARGS intentionally word-splits
-exec python baselines/llm/eval_alem.py \
+exec python algorithms/llm/eval_alem.py \
     "clients.0.client_name=vllm" "clients.0.model_id=${MODEL_ID}" "clients.0.base_url=${BASE_URL}" \
     "clients.1.client_name=vllm" "clients.1.model_id=${MODEL_ID}" "clients.1.base_url=${BASE_URL}" \
     "clients.2.client_name=vllm" "clients.2.model_id=${MODEL_ID}" "clients.2.base_url=${BASE_URL}" \

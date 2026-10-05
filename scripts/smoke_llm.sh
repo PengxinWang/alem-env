@@ -52,7 +52,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-exec uv run --extra llm --python 3.12 python examples/llm_openai_smoke.py \
+exec uv run --extra llm --python 3.12 python scripts/llm_openai_smoke.py \
   --model "${MODEL_ID}" \
   --base-url "${BASE_URL}" \
   --api-key "${API_KEY}" \

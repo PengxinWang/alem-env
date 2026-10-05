@@ -103,3 +103,7 @@ flake.lock
 flake.nix
 .vscode
 visualise/output/
+
+# Local environments and packaging output
+.venv/
+.venv-*/

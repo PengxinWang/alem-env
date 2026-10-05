@@ -67,6 +67,7 @@ jobs:
 
   publish:
     name: Publish to PyPI
+    if: github.repository == 'alem-world/alem-env'
     needs: build
     runs-on: ubuntu-latest
     environment:

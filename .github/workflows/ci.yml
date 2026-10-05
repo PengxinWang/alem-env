@@ -51,7 +51,7 @@ jobs:
         run: python -c "import alem; print('alem', alem.__version__)"
 
       - name: Env reset/step rollout
-        run: python examples/random_rl_agent.py --coord easy --steps 30 --log-every 0
+        run: python scripts/random_rl_agent.py --coord easy --steps 30 --log-every 0
 
       - name: Fast environment tests
         run: python -m unittest alem.tests.test_env_factory -v
@@ -79,7 +79,7 @@ jobs:
       - name: LLM wrapper and prompt tests
         run: |
           python -m unittest \
-            baselines.llm.test_ascii_map \
-            baselines.llm.test_language_wrapper \
-            baselines.llm.test_prompt_builder \
+            algorithms.llm.test_ascii_map \
+            algorithms.llm.test_language_wrapper \
+            algorithms.llm.test_prompt_builder \
             -v
