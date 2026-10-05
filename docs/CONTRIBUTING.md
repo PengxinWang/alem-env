@@ -58,7 +58,7 @@ uv run ruff format .
 *Alem* follows [semantic versioning](https://semver.org/). Any change that alters
 environment dynamics, observations, or scoring can change published results, so
 flag it in your PR description so it can be released under an appropriate version
-bump. The version lives in `pyproject.toml` and `CITATION.cff`; a matching
+bump. The version lives in `pyproject.toml` and `docs/CITATION.cff`; a matching
 `vX.Y.Z` git tag triggers the PyPI publish workflow.
 
 ## Code of conduct
