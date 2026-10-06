@@ -93,113 +93,118 @@ def collect_and_summarize_results(output_dir):
                 parts = relative_path.parts
 
                 if len(parts) >= 2:
+                    # Legacy layout: <run>/<env_name>/<task>/<task>_run_NN.json
                     env_name = parts[0]
                     task = parts[1] if len(parts) > 2 else "default"
-                    key = f"{env_name}/{task}"
+                else:
+                    # Flat layout: <run>/<task>_run_NN.json
+                    env_name = "alem"
+                    task = episode_log.get("task", "default")
+                key = f"{env_name}/{task}"
 
-                    episode_crashed = "error" in episode_log
-                    episode_invalid = (
-                        episode_crashed
-                        or episode_log.get("early_stop_reason")
-                        == "consecutive_length_incomplete_responses"
-                    )
-                    summary[key]["episodes"].append(episode_log)
-                    if episode_invalid:
-                        summary[key]["failed_episodes"].append(episode_log)
-                        # Skip invalid episodes from all stat accumulators below
-                        continue
-                    summary[key]["total_reward"] += episode_log.get("episode_return", 0.0)
-                    ep_steps = episode_log.get("num_steps", 0)
-                    summary[key]["total_steps"] += ep_steps
-                    summary[key]["all_episode_steps"].append(ep_steps)
-                    summary[key]["input_tokens"] += episode_log.get("input_tokens", 0)
-                    summary[key]["output_tokens"] += episode_log.get("output_tokens", 0)
-                    summary[key]["reasoning_tokens"] += episode_log.get("reasoning_tokens", 0)
-                    # Cached input bills at a fraction of the input rate, so
-                    # input_tokens on its own overstates what a run cost.
-                    summary[key]["cached_tokens"] += episode_log.get("cached_tokens", 0)
-                    summary[key]["incomplete_response_count"] += episode_log.get(
-                        "incomplete_response_count", 0
-                    )
-                    for reason, count in episode_log.get("incomplete_response_reasons", {}).items():
-                        summary[key]["incomplete_response_reasons"][reason] += count
-                    for reason, count in episode_log.get("stop_reason_counts", {}).items():
-                        summary[key]["stop_reason_counts"][reason] += count
+                episode_crashed = "error" in episode_log
+                episode_invalid = (
+                    episode_crashed
+                    or episode_log.get("early_stop_reason")
+                    == "consecutive_length_incomplete_responses"
+                )
+                summary[key]["episodes"].append(episode_log)
+                if episode_invalid:
+                    summary[key]["failed_episodes"].append(episode_log)
+                    # Skip invalid episodes from all stat accumulators below
+                    continue
+                summary[key]["total_reward"] += episode_log.get("episode_return", 0.0)
+                ep_steps = episode_log.get("num_steps", 0)
+                summary[key]["total_steps"] += ep_steps
+                summary[key]["all_episode_steps"].append(ep_steps)
+                summary[key]["input_tokens"] += episode_log.get("input_tokens", 0)
+                summary[key]["output_tokens"] += episode_log.get("output_tokens", 0)
+                summary[key]["reasoning_tokens"] += episode_log.get("reasoning_tokens", 0)
+                # Cached input bills at a fraction of the input rate, so
+                # input_tokens on its own overstates what a run cost.
+                summary[key]["cached_tokens"] += episode_log.get("cached_tokens", 0)
+                summary[key]["incomplete_response_count"] += episode_log.get(
+                    "incomplete_response_count", 0
+                )
+                for reason, count in episode_log.get("incomplete_response_reasons", {}).items():
+                    summary[key]["incomplete_response_reasons"][reason] += count
+                for reason, count in episode_log.get("stop_reason_counts", {}).items():
+                    summary[key]["stop_reason_counts"][reason] += count
 
-                    agent_stats = []
-                    for i in range(10):
-                        agent_key = f"agent_{i}"
-                        if agent_key in episode_log:
-                            agent_stats.append((i, episode_log[agent_key]))
-                            if f"agent_{i}_return" in episode_log:
-                                summary[key]["per_agent_rewards"][i].append(
-                                    episode_log[f"agent_{i}_return"]
-                                )
-
-                    if not agent_stats:
-                        if "score" in episode_log:
-                            agent_stats = [
-                                (
-                                    0,
-                                    {
-                                        "score": episode_log["score"],
-                                        "progression": episode_log.get("progression", 0.0),
-                                        "achievements": episode_log.get("achievements", {}),
-                                    },
-                                )
-                            ]
-                            if "episode_return" in episode_log:
-                                summary[key]["per_agent_rewards"][0].append(
-                                    episode_log["episode_return"]
-                                )
-
-                    for agent_id, agent_stat in agent_stats:
-                        if "score" in agent_stat:
-                            summary[key]["total_score"] = (
-                                summary[key].get("total_score", 0.0) + agent_stat["score"]
-                            )
-                        if "progression" in agent_stat:
-                            progression = agent_stat["progression"]
-                            summary[key]["total_progression"] = (
-                                summary[key].get("total_progression", 0.0) + progression
-                            )
-                            summary[key]["all_progressions"].append(progression)
-
-                        if "achievements" in agent_stat and agent_stat["achievements"]:
-                            for achievement_name in agent_stat["achievements"].keys():
-                                summary[key]["all_achievements"].add(achievement_name)
-
-                            num_achievements = len(agent_stat["achievements"])
-                            achieved_count = sum(
-                                1 for v in agent_stat["achievements"].values() if v == 1
+                agent_stats = []
+                for i in range(10):
+                    agent_key = f"agent_{i}"
+                    if agent_key in episode_log:
+                        agent_stats.append((i, episode_log[agent_key]))
+                        if f"agent_{i}_return" in episode_log:
+                            summary[key]["per_agent_rewards"][i].append(
+                                episode_log[f"agent_{i}_return"]
                             )
 
-                            summary[key]["per_agent_achievements"][agent_id].append(achieved_count)
-                            if num_achievements > 0:
-                                summary[key]["per_agent_achievement_pcts"][agent_id].append(
-                                    (achieved_count / num_achievements) * 100.0
-                                )
+                if not agent_stats:
+                    if "score" in episode_log:
+                        agent_stats = [
+                            (
+                                0,
+                                {
+                                    "score": episode_log["score"],
+                                    "progression": episode_log.get("progression", 0.0),
+                                    "achievements": episode_log.get("achievements", {}),
+                                },
+                            )
+                        ]
+                        if "episode_return" in episode_log:
+                            summary[key]["per_agent_rewards"][0].append(
+                                episode_log["episode_return"]
+                            )
 
-                            for achievement_name, achieved in agent_stat["achievements"].items():
-                                if achieved == 1:
-                                    summary[key]["achievement_counts"][achievement_name] += 1
-
-                    # Accumulate user_info metrics from compute_score
-                    if "user_info" in episode_log:
-                        for metric_key, value in episode_log["user_info"].items():
-                            summary[key]["user_info_accum"][metric_key].append(value)
-
-                    # Collect per-agent debriefs for the aggregated debrief file
-                    if "debriefs" in episode_log:
-                        ep_idx = episode_log.get("seed", len(summary[key].get("debriefs", [])))
-                        if "debriefs" not in summary[key]:
-                            summary[key]["debriefs"] = []
-                        summary[key]["debriefs"].append(
-                            {
-                                "episode": ep_idx,
-                                "agents": episode_log["debriefs"],
-                            }
+                for agent_id, agent_stat in agent_stats:
+                    if "score" in agent_stat:
+                        summary[key]["total_score"] = (
+                            summary[key].get("total_score", 0.0) + agent_stat["score"]
                         )
+                    if "progression" in agent_stat:
+                        progression = agent_stat["progression"]
+                        summary[key]["total_progression"] = (
+                            summary[key].get("total_progression", 0.0) + progression
+                        )
+                        summary[key]["all_progressions"].append(progression)
+
+                    if "achievements" in agent_stat and agent_stat["achievements"]:
+                        for achievement_name in agent_stat["achievements"].keys():
+                            summary[key]["all_achievements"].add(achievement_name)
+
+                        num_achievements = len(agent_stat["achievements"])
+                        achieved_count = sum(
+                            1 for v in agent_stat["achievements"].values() if v == 1
+                        )
+
+                        summary[key]["per_agent_achievements"][agent_id].append(achieved_count)
+                        if num_achievements > 0:
+                            summary[key]["per_agent_achievement_pcts"][agent_id].append(
+                                (achieved_count / num_achievements) * 100.0
+                            )
+
+                        for achievement_name, achieved in agent_stat["achievements"].items():
+                            if achieved == 1:
+                                summary[key]["achievement_counts"][achievement_name] += 1
+
+                # Accumulate user_info metrics from compute_score
+                if "user_info" in episode_log:
+                    for metric_key, value in episode_log["user_info"].items():
+                        summary[key]["user_info_accum"][metric_key].append(value)
+
+                # Collect per-agent debriefs for the aggregated debrief file
+                if "debriefs" in episode_log:
+                    ep_idx = episode_log.get("seed", len(summary[key].get("debriefs", [])))
+                    if "debriefs" not in summary[key]:
+                        summary[key]["debriefs"] = []
+                    summary[key]["debriefs"].append(
+                        {
+                            "episode": ep_idx,
+                            "agents": episode_log["debriefs"],
+                        }
+                    )
 
             except Exception as e:
                 logger.warning(f"Failed to load {json_file}: {e}")

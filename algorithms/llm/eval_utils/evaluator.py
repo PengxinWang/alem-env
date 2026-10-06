@@ -157,7 +157,7 @@ def _save_episode_trajectory(
     if T == 0 or any(x is None for x in traj_obs):
         return
     try:
-        traj_dir = os.path.join(output_dir, env_name, task)
+        traj_dir = output_dir
         Path(traj_dir).mkdir(exist_ok=True, parents=True)
         save_path = os.path.join(traj_dir, f"{task}_run_{episode_idx:02d}_trajectory.npz")
         np.savez_compressed(
@@ -193,7 +193,7 @@ def _save_episode_states(
         return
 
     try:
-        traj_dir = os.path.join(output_dir, env_name, task)
+        traj_dir = output_dir
         Path(traj_dir).mkdir(exist_ok=True, parents=True)
         save_path = os.path.join(traj_dir, f"{task}_run_{episode_idx:02d}_states.pkl.gz")
         payload = {
@@ -234,10 +234,7 @@ class EvaluatorManager:
             for task in evaluator.tasks:
                 for episode_idx in range(evaluator.num_episodes):
                     json_filename = os.path.join(
-                        self.output_dir,
-                        env_name,
-                        task,
-                        f"{task}_run_{episode_idx:02d}.json",
+                        self.output_dir, f"{task}_run_{episode_idx:02d}.json"
                     )
                     if os.path.exists(json_filename):
                         logging.info(
@@ -550,12 +547,8 @@ class Evaluator:
         llm_frames = [] if save_images else None
         llm_agent_data_per_step = [] if save_images else None
 
-        csv_filename = os.path.join(
-            self.output_dir, self.env_name, task, f"{task}_run_{episode_idx:02d}.csv"
-        )
-        debug_filename = os.path.join(
-            self.output_dir, self.env_name, task, f"{task}_run_{episode_idx:02d}_debug.jsonl"
-        )
+        csv_filename = os.path.join(self.output_dir, f"{task}_run_{episode_idx:02d}.csv")
+        debug_filename = os.path.join(self.output_dir, f"{task}_run_{episode_idx:02d}_debug.jsonl")
         Path(csv_filename).parent.mkdir(exist_ok=True, parents=True)
 
         with (
@@ -1196,7 +1189,7 @@ class Evaluator:
 
             # Save GIFs: per-agent + combined side-by-side
             if save_images and any(len(f) > 0 for f in agent_frames.values()):
-                gif_dir = os.path.join(self.output_dir, self.env_name, task)
+                gif_dir = self.output_dir
                 Path(gif_dir).mkdir(exist_ok=True, parents=True)
 
                 per_agent_arrays = {}
@@ -1407,12 +1400,7 @@ class Evaluator:
                 )
             episode_log["clients"] = clients_log
 
-            json_filename = os.path.join(
-                self.output_dir,
-                self.env_name,
-                task,
-                f"{task}_run_{episode_idx:02d}.json",
-            )
+            json_filename = os.path.join(self.output_dir, f"{task}_run_{episode_idx:02d}.json")
             Path(json_filename).parent.mkdir(exist_ok=True, parents=True)
             with open(json_filename, "w") as f:
                 json.dump(episode_log, f, indent=4)
@@ -1420,10 +1408,7 @@ class Evaluator:
             # Save debrief to a separate plain-text file for easy inspection
             if episode_log.get("debriefs"):
                 debrief_filename = os.path.join(
-                    self.output_dir,
-                    self.env_name,
-                    task,
-                    f"{task}_run_{episode_idx:02d}_debrief.txt",
+                    self.output_dir, f"{task}_run_{episode_idx:02d}_debrief.txt"
                 )
                 try:
                     with open(debrief_filename, "w", encoding="utf-8") as df:

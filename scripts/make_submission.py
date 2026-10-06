@@ -13,7 +13,7 @@ Usage:
         --name "GPT-4o mini" --family GPT --params "—"
 
 Difficulty runs are auto-discovered as the most recent
-`outputs/alem_eval/*_<model>_<difficulty>/` dir; override any of them with
+`outputs/eval/*_<model>_<difficulty>/` dir; override any of them with
 --easy/--medium/--hard <run-dir>.
 """
 
@@ -72,9 +72,16 @@ def _find_run_dir(outputs_dir: str, model_id: str, difficulty: str) -> str | Non
     return sorted(dirs)[-1] if dirs else None
 
 
+def _episode_dir(run_dir: str) -> str:
+    """Directory holding the per-episode files: the run dir itself, or the
+    legacy nested `alem/default/` subdir for runs written before the flat layout."""
+    legacy = os.path.join(run_dir, "alem", "default")
+    return legacy if os.path.isdir(legacy) else run_dir
+
+
 def _per_episode_scores(run_dir: str) -> dict[str, np.ndarray]:
     """Per-episode Base/Coord/Total (0-1 fractions) read from each run json's user_info."""
-    task_dir = os.path.join(run_dir, "alem", "default")
+    task_dir = _episode_dir(run_dir)
     run_files = sorted(
         f
         for f in glob.glob(os.path.join(task_dir, "default_run_*.json"))
@@ -150,7 +157,7 @@ def _copy_evidence(run_dir: str, difficulty: str, bundle_dir: str) -> list[str]:
         dst = os.path.join(bundle_dir, f"{difficulty}_summary_stats.json")
         shutil.copy(src_summary, dst)
         copied.append(dst)
-    task_dir = os.path.join(run_dir, "alem", "default")
+    task_dir = _episode_dir(run_dir)
     # Combined gameplay GIF and self-contained debug HTML for episode 0.
     for pattern, suffix in (
         (f"{task_dir}/*_run_00.gif", "gif"),
@@ -185,7 +192,7 @@ def main() -> int:
     # Keep in step with LLM_STACK_VERSION in alem/_version.py: the wrapper and
     # the harness are one interface and share a version.
     p.add_argument("--harness-version", default="robust_all_v0.1.1")
-    p.add_argument("--outputs", default="outputs/alem_eval", help="Where eval runs were written")
+    p.add_argument("--outputs", default="outputs/eval", help="Where eval runs were written")
     p.add_argument(
         "--out", default="outputs/submissions", help="Where to write the submission bundle"
     )
@@ -223,7 +230,7 @@ def main() -> int:
         return 1
     if empty:
         print(
-            "\nERROR: no per-episode result files (alem/default/default_run_*.json) in:",
+            "\nERROR: no per-episode result files (default_run_*.json) in:",
             file=sys.stderr,
         )
         for diff, d in empty:

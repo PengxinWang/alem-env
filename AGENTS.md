@@ -47,8 +47,8 @@ scripts/run_llm_eval.sh MODEL_ID --base-url http://localhost:8000/v1 \
 ```
 
 Hosted APIs need no vLLM: pass `--client openai|anthropic|gemini|nvidia|xai` and the matching
-key. Results land in `outputs/alem_eval/<timestamp>_<model>_<difficulty>/`, one
-`alem/default/default_run_NN.json` per episode plus `summary_stats.json`.
+key. Results land in `outputs/eval/<timestamp>_<model>_<difficulty>/`, one
+`default_run_NN.json` per episode plus `summary_stats.json`.
 
 ## Turn the run into a submission
 

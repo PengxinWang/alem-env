@@ -98,7 +98,7 @@ clients:
 
 # Evaluation settings
 eval:
-  output_dir: "outputs/alem_eval"
+  output_dir: "outputs/eval"
   resume_from: null
   run_name: null  # Optional stable base name for resumable runs; difficulty is appended automatically.
   upload_only: false  # If true, skip evaluator.run() and only upload existing results from resume_from to W&B.

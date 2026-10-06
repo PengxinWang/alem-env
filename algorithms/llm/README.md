@@ -364,7 +364,7 @@ eval:
 
 ## Outputs
 
-Each run creates a timestamped directory under `outputs/alem_eval/` containing
+Each run creates a timestamped directory under `outputs/eval/` containing
 per-episode CSVs, episode-stat JSON, a debug JSONL plus a self-contained HTML
 debug viewer, and (when `save_images=true`) per-agent and combined GIFs.
 

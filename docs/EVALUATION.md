@@ -107,7 +107,7 @@ continues from where it stopped:
 
 ```bash
 python algorithms/llm/eval_alem.py \
-    eval.resume_from=outputs/alem_eval/<run-dir> \
+    eval.resume_from=outputs/eval/<run-dir> \
     ... # same overrides as the original run
 ```
 
